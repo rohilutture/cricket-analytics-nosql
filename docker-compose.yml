@@ -1,0 +1,30 @@
+services:
+  mongodb:
+    image: mongo:6.0
+    platform: linux/amd64
+    container_name: cricket_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo:/data/db
+
+  neo4j:
+    image: neo4j:5.20
+    platform: linux/amd64
+    container_name: cricket_neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/neo4j123
+    volumes:
+      - ./data/neo4j:/data
+
+  analytics:
+    build: .
+    platform: linux/amd64
+    container_name: cricket_analytics
+    depends_on:
+      - mongodb
+      - neo4j
+    command: ["python", "mongo_analytics_examples.py"]
